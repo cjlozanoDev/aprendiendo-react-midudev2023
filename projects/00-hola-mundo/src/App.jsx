@@ -1,23 +1,39 @@
-import './App.css';
+import "./App.css";
+import { TwitterFollowCard } from "./TwitterFollowCard.jsx";
+
+const users = [
+  {
+    userName: "cjlozanodev",
+    name: " Carlos Javier Lozano Pérez",
+    isFollowing: true,
+  },
+  {
+    userName: "midudev",
+    name: "Miguel Ángel Durán",
+    isFollowing: false,
+  },
+  {
+    userName: "mouredev",
+    name: "Brais Moure",
+    isFollowing: true,
+  },
+];
 
 export function App() {
   return (
-    <article className='tw-follow-card'>
-      <header className='tw-follow-card-header'>
-        <img
-          className="tw-follow-card-avatar"
-          alt="El avatar de carlosjlp"
-          src="https://unavatar.io/github/cjlozanodev"/>
-        <div className='tw-follow-card-info'>
-          <strong> Carlos Javier Lozano </strong>
-          <span className='tw-follow-card-info-user-name'>@carlosjlp</span>
-        </div>
-      </header>
-      <aside>
-        <button className='tw-follow-card-button'>
-          Seguir
-        </button>
-      </aside>
-    </article>
-  )
+    <section className="app">
+      {users.map((user) => {
+        const { userName, name, isFollowing } = user;
+        return (
+          <TwitterFollowCard
+            key={userName}
+            userName={userName}
+            initialIsFollowing={isFollowing}
+          >
+            {name}
+          </TwitterFollowCard>
+        );
+      })}
+    </section>
+  );
 }
