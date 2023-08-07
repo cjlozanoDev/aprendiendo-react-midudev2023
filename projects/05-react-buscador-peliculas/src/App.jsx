@@ -3,48 +3,62 @@ import { Movies } from './components/Movies'
 import { useMovies } from './hooks/useMovies'
 import './App.css'
 
-function App () {
-  const { movies } = useMovies()
-  const [query, setQuery] = useState('')
+function useSearch () {
+  const [search, updateSearch] = useState('')
   const [error, setError] = useState(null)
-
-  const handleSubmit = (event) => {
-    event.preventDefault()
-  }
-
-  const handleChange = (event) => {
-    setQuery(event.target.value)
-  }
+  const isFirstInput = useRef(true)
 
   useEffect(() => {
-    if (query === '') {
+    if (isFirstInput.current) {
+      isFirstInput.current = search === ''
+      return
+    }
+    if (search === '') {
       setError('No se puede buscar una película vacía')
       return
     }
-    if (query.match(/^\d+$/)) {
+    if (search.match(/^\d+$/)) {
       setError('No se puede buscar una película con un número')
       return
     }
-    if (query.length < 3) {
+    if (search.length < 3) {
       setError('La búsqueda debe tener al menos 3 caracteres')
       return
     }
     setError(null)
-  }, [query])
+  }, [search])
+
+  return { search, updateSearch, error }
+}
+
+function App () {
+  const { search, updateSearch, error } = useSearch()
+  const { movies, getMovies, loading } = useMovies({ search })
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    getMovies()
+  }
+
+  const handleChange = (event) => {
+    updateSearch(event.target.value)
+  }
 
   return (
     <div className='page'>
       <header>
         <h1>Buscador de películas </h1>
         <form className='form' onSubmit={handleSubmit}>
-          <input style={{ border: '1px solid transparent', borderColor: error ? 'red' : 'transparent' }} onChange={handleChange} value={query} name='query' placeholder='Avengers, StarWars, The Matrix...' />
+          <input style={{ border: '1px solid transparent', borderColor: error ? 'red' : 'transparent' }} onChange={handleChange} value={search} name='query' placeholder='Avengers, StarWars, The Matrix...' />
           <button type='submit'>Buscar </button>
         </form>
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </header>
 
       <main>
-        <Movies movies={movies} />
+        {
+          loading ? <p> Cargando... </p> : <Movies movies={movies} />
+        }
       </main>
     </div>
   )
